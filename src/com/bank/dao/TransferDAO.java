@@ -1,15 +1,18 @@
 package com.bank.dao;
 
 import com.bank.bean.TransferBean;
+import com.bank.enums.TxnType;
 import com.bank.utility.ConnectionPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransferDAO {
-    public boolean transferMoney(String SenderAcc_no , String pin, String ReceiverAcc_no, Double amount){
+    public boolean transferMoney(String SenderAcc_no, String pin, String ReceiverAcc_no, Double amount) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -21,7 +24,7 @@ public class TransferDAO {
             ps = conn.prepareStatement(checkSender);
             ps.setString(1, SenderAcc_no);
             rs = ps.executeQuery();
-            if (!rs.next()){
+            if (!rs.next()) {
                 System.out.println("Sender's account do not exist or is inactive");
                 return false;
             }
@@ -29,12 +32,12 @@ public class TransferDAO {
             String actualPin = rs.getString("pin");
             Double senderBalance = rs.getDouble("balance");
 
-            if (!actualPin.equals(pin)){
+            if (!actualPin.equals(pin)) {
                 System.out.println("Incorrect Pin , transaction failed");
                 return false;
             }
 
-            if (senderBalance < amount){
+            if (senderBalance < amount) {
                 System.out.println("Insufficient balance , transaction failed");
                 return false;
             }
@@ -47,7 +50,7 @@ public class TransferDAO {
             ps = conn.prepareStatement(checkReceiver);
             ps.setString(1, ReceiverAcc_no);
             rs = ps.executeQuery();
-            if (!rs.next()){
+            if (!rs.next()) {
                 System.out.println("Receiver's account to not exist");
                 return false;
             }
@@ -101,15 +104,15 @@ public class TransferDAO {
 
         } catch (Exception e) {
             try {
-                if (conn != null)conn.rollback();
+                if (conn != null) conn.rollback();
                 System.out.println("Error occurred . Transaction rolled back");
             } catch (SQLException se) {
-            se.printStackTrace();
-        }
+                se.printStackTrace();
+            }
             e.printStackTrace();
             return false;
 
-    } finally {
+        } finally {
             try {
                 if (ps != null) ps.close();
                 if (conn != null) conn.setAutoCommit(true);
@@ -118,5 +121,76 @@ public class TransferDAO {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public List<TransferBean> getAllTransaction() {
+        List<TransferBean> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer";
+        try {
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return list;
+    }
+    public List<TransferBean> getTransactionByAccountNo(String Acc_no){
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+        List<TransferBean> list = new ArrayList<>();
+
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer where acc_no = ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, Acc_no);
+            rs = ps.executeQuery();
+            while (rs.next()){
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return list;
+    }
 }
