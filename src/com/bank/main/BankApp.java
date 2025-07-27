@@ -272,24 +272,87 @@ public class BankApp {
 //        }
 //
 //    }
-        System.out.println("Enter Account Number to see the Transaction");
+//        System.out.println("Enter Account Number to see the Transaction");
+//        String num = scanner.nextLine();
+//        List<TransferBean> list = td.getTransactionByAccountNo(num);
+//        if (list.isEmpty()){
+//            System.out.println("No Transaction....");
+//        } else {
+//            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
+//            System.out.println("------------------------------------------------------------------------------");
+//            for (TransferBean t : list) {
+//                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+//            }
+//        }
+
+//        System.out.println("Enter Start Date to see the Transaction");
+//        String fromDate = scanner.nextLine();
+//        System.out.println("Enter End Date to see the Transaction");
+//        String toDate = scanner.nextLine();
+//        List<TransferBean> list = td.getTransactionByDateRange(fromDate, toDate);
+//        if (list.isEmpty()){
+//            System.out.println("No Transaction....");
+//        } else {
+//            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
+//            System.out.println("------------------------------------------------------------------------------");
+//            for (TransferBean t : list) {
+//                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+//            }
+//        }
+//        System.out.println("Enter Account Number to see the Mini Statement");
+//        String num = scanner.nextLine();
+//        List<TransferBean> list = td.getMiniStatement(num);
+//        if (list.isEmpty()){
+//            System.out.println("No Transaction....");
+//        } else {
+//            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
+//            System.out.println("------------------------------------------------------------------------------");
+//            for (TransferBean t : list) {
+//                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+//            }
+//        }
+//        System.out.println("Enter Account Number to see the Statement");
+//        String acc_num = scanner.nextLine();
+//        System.out.println("Enter digit till where you want to see transaction");
+//        int num = scanner.nextInt();
+//        scanner.nextLine();
+
+//        List<TransferBean> list = td.getLastNTransactions(acc_num, num);
+//        if (list.isEmpty()){
+//            System.out.println("No Transaction....");
+//        } else {
+//            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
+//            System.out.println("-------------------------------------------------------------------------------------");
+//            for (TransferBean t : list) {
+//                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+//            }
+//        }
+        System.out.println("Enter Your Account Number To See Money Credit Transaction");
         String num = scanner.nextLine();
-        List<TransferBean> list = td.getTransactionByAccountNo(num);
+        List<TransferBean> list = td.getSentTransaction(num);
         if (list.isEmpty()){
             System.out.println("No Transaction....");
         } else {
             System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
                     "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
-            System.out.println("------------------------------------------------------------------------------");
+            System.out.println("-------------------------------------------------------------------------------------");
             for (TransferBean t : list) {
                 System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
                         t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
             }
         }
 
+
+
     }
-
-
 }
 
 

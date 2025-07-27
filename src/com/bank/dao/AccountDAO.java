@@ -1,6 +1,7 @@
 package com.bank.dao;
 
 import com.bank.bean.AccountBean;
+import com.bank.bean.TransferBean;
 import com.bank.enums.AccountStatus;
 import com.bank.enums.AccountType;
 import com.bank.utility.ConnectionPool;
@@ -139,31 +140,32 @@ public class AccountDAO {
         }
         return result;
     }
-    public List<AccountBean> getAllAccount(){
-      Connection conn= null;
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      AccountBean ab = null;
-      List<AccountBean> list = new ArrayList<>();
-      conn = ConnectionPool.connectDB();
-      String sql = "select * from account";
+
+    public List<AccountBean> getAllAccount() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        AccountBean ab = null;
+        List<AccountBean> list = new ArrayList<>();
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from account";
         try {
             ps = conn.prepareStatement(sql);
             rs = ps.executeQuery();
-            while (rs.next()){
-              ab = new AccountBean();
-              ab.setAcc_no(rs.getString("acc_no"));
-              ab.setCustomer_name(rs.getString("customer_name"));
-              ab.setPin(rs.getString("pin"));
-              ab.setAccountType(AccountType.valueOf(rs.getString("acc_type").toUpperCase()));
-              ab.setAccountStatus(AccountStatus.valueOf(rs.getString("status").toUpperCase()));
-              ab.setAcc_created(rs.getTimestamp("acc_created"));
-              list.add(ab);
+            while (rs.next()) {
+                ab = new AccountBean();
+                ab.setAcc_no(rs.getString("acc_no"));
+                ab.setCustomer_name(rs.getString("customer_name"));
+                ab.setPin(rs.getString("pin"));
+                ab.setAccountType(AccountType.valueOf(rs.getString("acc_type").toUpperCase()));
+                ab.setAccountStatus(AccountStatus.valueOf(rs.getString("status").toUpperCase()));
+                ab.setAcc_created(rs.getTimestamp("acc_created"));
+                list.add(ab);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
+        } finally {
             try {
                 if (rs != null) rs.close();
                 if (ps != null) ps.close();
@@ -174,6 +176,7 @@ public class AccountDAO {
         }
         return list;
     }
+
     public boolean validAccount(String acc_no, String pin) throws SQLException {
         Connection conn = null;
         PreparedStatement ps = null;
@@ -187,12 +190,12 @@ public class AccountDAO {
             ps.setString(1, acc_no);
             ps.setString(2, pin);
             rs = ps.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 isValid = true;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
+        } finally {
             try {
                 if (rs != null) rs.close();
                 if (ps != null) ps.close();
@@ -201,9 +204,10 @@ public class AccountDAO {
                 throw new RuntimeException(e);
             }
         }
-       return isValid;
+        return isValid;
     }
-    public AccountBean checkBalance(String acc_no, String pin){
+
+    public AccountBean checkBalance(String acc_no, String pin) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -216,7 +220,7 @@ public class AccountDAO {
             ps.setString(1, acc_no);
             ps.setString(2, pin);
             rs = ps.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 ab = new AccountBean();
                 ab.setBalance(rs.getDouble("balance"));
             }
@@ -233,7 +237,8 @@ public class AccountDAO {
         }
         return ab;
     }
-    public int updateBalance(String acc_no, double newBal){
+
+    public int updateBalance(String acc_no, double newBal) {
         Connection conn = null;
         PreparedStatement ps = null;
         int result = 0;
@@ -247,7 +252,7 @@ public class AccountDAO {
             result = ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
+        } finally {
             try {
                 if (ps != null) ps.close();
                 if (conn != null) conn.close();
@@ -255,9 +260,10 @@ public class AccountDAO {
                 throw new RuntimeException(e);
             }
         }
-       return result;
+        return result;
     }
-    public int changePin(String acc_num, String oldPin, String newPin){
+
+    public int changePin(String acc_num, String oldPin, String newPin) {
         Connection conn = null;
         PreparedStatement ps = null;
         int result = 0;
@@ -272,7 +278,7 @@ public class AccountDAO {
             result = ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
+        } finally {
             try {
                 if (ps != null) ps.close();
                 if (conn != null) conn.close();
@@ -283,3 +289,4 @@ public class AccountDAO {
         return result;
     }
 }
+

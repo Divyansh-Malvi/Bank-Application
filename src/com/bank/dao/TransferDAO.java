@@ -157,7 +157,8 @@ public class TransferDAO {
         }
         return list;
     }
-    public List<TransferBean> getTransactionByAccountNo(String Acc_no){
+
+    public List<TransferBean> getTransactionByAccountNo(String Acc_no) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -170,7 +171,7 @@ public class TransferDAO {
             ps = conn.prepareStatement(sql);
             ps.setString(1, Acc_no);
             rs = ps.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 tb = new TransferBean();
                 tb.setAcc_no(rs.getString("acc_no"));
                 tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
@@ -181,8 +182,7 @@ public class TransferDAO {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             try {
                 if (rs != null) rs.close();
                 if (ps != null) ps.close();
@@ -193,4 +193,151 @@ public class TransferDAO {
         }
         return list;
     }
+
+    public List<TransferBean> getTransactionByDateRange(String FromDate, String ToDate) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+        List<TransferBean> list = new ArrayList<>();
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer where date(txn_date) between ? and ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, FromDate);
+            ps.setString(2, ToDate);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return list;
+    }
+
+    public List<TransferBean> getMiniStatement(String acc_no) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+        List<TransferBean> list = new ArrayList<>();
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer where acc_no = ? order by txn_date limit 5";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, acc_no);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return list;
+    }
+
+    public List<TransferBean> getLastNTransactions(String acc_no, int n) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+        List<TransferBean> list = new ArrayList<>();
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer where acc_no = ? order by txn_date desc limit ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, acc_no);
+            ps.setInt(2, n);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return list;
+    }
+
+    public List<TransferBean> getSentTransaction(String acc_no) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+        List<TransferBean> list = new ArrayList<>();
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer where acc_no = ? and txn_type = ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, acc_no);
+            ps.setString(2, "credit");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return list;
+    }
+
 }
