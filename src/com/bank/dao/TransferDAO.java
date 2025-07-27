@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TransferDAO {
     public boolean transferMoney(String SenderAcc_no, String pin, String ReceiverAcc_no, Double amount) {
@@ -315,6 +317,41 @@ public class TransferDAO {
         try {
             ps = conn.prepareStatement(sql);
             ps.setString(1, acc_no);
+            ps.setString(2, "debit");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                tb = new TransferBean();
+                tb.setAcc_no(rs.getString("acc_no"));
+                tb.setBeneficiary_acc_no(rs.getString("beneficiary_acc_no"));
+                tb.setTxnType(TxnType.valueOf(rs.getString("txn_type")));
+                tb.setTxn_amount(rs.getDouble("txn_amount"));
+                tb.setTxn_date(rs.getTimestamp("txn_date"));
+                list.add(tb);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return list;
+    }
+    public List<TransferBean> getReceiveTransaction(String acc_no) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        TransferBean tb = null;
+        List<TransferBean> list = new ArrayList<>();
+        conn = ConnectionPool.connectDB();
+        String sql = "select * from transfer where beneficiary_acc_no = ? and txn_type = ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, acc_no);
             ps.setString(2, "credit");
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -339,5 +376,110 @@ public class TransferDAO {
         }
         return list;
     }
+    public double getTotalTransferredAmount(String acc_no){
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        double totalAmount = 0;
+        conn = ConnectionPool.connectDB();
+        String sql = "select sum(txn_amount) from transfer where acc_no = ? and txn_type = ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, acc_no);
+            ps.setString(2, "debit");
+            rs = ps.executeQuery();
+            if (rs.next()){
+                totalAmount = rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+return totalAmount;
+    }
+
+    public double getTotalReceivedAmount(String acc_no){
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        double totalAmount = 0;
+        conn = ConnectionPool.connectDB();
+        String sql = "select sum(txn_amount) from transfer where acc_no = ? and txn_type = ?";
+        try {
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, acc_no);
+            ps.setString(2, "credit");
+            rs = ps.executeQuery();
+            if (rs.next()){
+                totalAmount = rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return totalAmount;
+    }
+
+    public Map<String , Double> getTransactionSummary(String acc_no){
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Map<String, Double> summary = new HashMap<>();
+        conn = ConnectionPool.connectDB();
+
+        // Money sent summary
+        String sqlDebit = "select sum(txn_amount) from transfer where acc_no = ? and txn_type = ?";
+        try {
+            ps = conn.prepareStatement(sqlDebit);
+            ps.setString(1, acc_no);
+            ps.setString(2, "debit");
+            rs = ps.executeQuery();
+            if (rs.next()){
+                summary.put("Total Debited", rs.getDouble(1));
+            }
+            rs.close();
+            ps.close();
+
+            //Money Received summary
+            String sqlCredit = "select sum(txn_amount) from transfer where acc_no = ? and txn_type = ?";
+            ps = conn.prepareStatement(sqlCredit);
+            ps.setString(1, acc_no);
+            ps.setString(2, "credit");
+            rs = ps.executeQuery();
+            if (rs.next()){
+                summary.put("Amount Credited", rs.getDouble(1));
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }finally {
+            try {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return summary;
+
+    }
+
 
 }

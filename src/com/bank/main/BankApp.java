@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import static com.bank.utility.ConnectionPool.connectDB;
@@ -335,18 +336,64 @@ public class BankApp {
 //                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
 //            }
 //        }
-        System.out.println("Enter Your Account Number To See Money Credit Transaction");
+//        System.out.println("Enter Your Account Number To See Money Credit Transaction");
+//        String num = scanner.nextLine();
+//        List<TransferBean> list = td.getSentTransaction(num);
+//        if (list.isEmpty()){
+//            System.out.println("No Transaction....");
+//        } else {
+//            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
+//            System.out.println("-------------------------------------------------------------------------------------");
+//            for (TransferBean t : list) {
+//                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+//            }
+//        }
+//        System.out.println("Enter Your Account Number To See Money Credit Transaction");
+//        String num = scanner.nextLine();
+//        List<TransferBean> list = td.getReceiveTransaction(num);
+//        if (list.isEmpty()){
+//            System.out.println("No Transaction....");
+//        } else {
+//            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
+//            System.out.println("-------------------------------------------------------------------------------------");
+//            for (TransferBean t : list) {
+//                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
+//                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+//            }
+//        }
+//        System.out.println("Enter Your Account Number To See Money Credit Transaction");
+//        String num = scanner.nextLine();
+//        double totalAmount = td.getTotalTransferredAmount(num);
+//        if (totalAmount > 0){
+//            System.out.println("Total Amount Sent By Account Number " + num + "= " + totalAmount);
+//        } else {
+//            System.out.println("No amount transferred");
+//        }
+//        System.out.println("Enter Your Account Number To See Money Credit Transaction");
+//        String num = scanner.nextLine();
+//        double totalAmount = td.getTotalReceivedAmount(num);
+//        if (totalAmount > 0){
+//            System.out.println("Total Amount Received By Account Number " + num + "= " + totalAmount);
+//        } else {
+//            System.out.println("No amount transferred");
+//        }
+        System.out.println("Enter Your Account Number To See Money Credit/Debit Summary:");
         String num = scanner.nextLine();
-        List<TransferBean> list = td.getSentTransaction(num);
-        if (list.isEmpty()){
-            System.out.println("No Transaction....");
+
+        Map<String, Double> summary = td.getTransactionSummary(num);
+
+        if (summary.isEmpty()) {
+            System.out.println("No transactions found for this account.");
         } else {
-            System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
-                    "Account No.", "Beneficiary Acc. No.", "Txn Type", "Txn Amount", "Txn Date");
-            System.out.println("-------------------------------------------------------------------------------------");
-            for (TransferBean t : list) {
-                System.out.printf("%-15s %-22s %-10s %-12s %-20s%n \n",
-                        t.getAcc_no(), t.getBeneficiary_acc_no(), t.getTxnType(), t.getTxn_amount(), t.getTxn_date() );
+            System.out.println("-------- Transaction Summary --------");
+            System.out.printf("%-10s | %-15s\n", "Txn Type", "Total Amount");
+            System.out.println("-------------------------------------");
+
+            for (Map.Entry<String, Double> entry : summary.entrySet()) {
+                System.out.printf("%-10s | %-15.2f\n", entry.getKey(), entry.getValue());
             }
         }
 
